@@ -38,9 +38,9 @@ for i, file in enumerate(up_loaded_files):
     #st.image(im_bgr_to_rgb, caption="Original Image", use_column_width=True)
 
     with st.spinner("Cutting...."):
-        mask, resized_im, cont = mask_extracting(im_bgr_to_rgb, model)
+        mask, resized_im, cont, conf = mask_extracting(im_bgr_to_rgb, model)
         if mask is not None and conf >= 0.01:
-            plate = cropping_plate(im_in, mask, con)
+            plate = cropping_plate(im_in, mask, cont)
 
     st.image(resized_im, caption=f"The image_{i}", use_container_width=True)
 
