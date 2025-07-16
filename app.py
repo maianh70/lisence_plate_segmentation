@@ -39,24 +39,28 @@ for i, file in enumerate(up_loaded_files):
 
     with st.spinner("Cutting...."):
         mask, resized_im, cont = mask_extracting(im_bgr_to_rgb, model)
-        plate = cropping_plate(resized_im, mask, cont)
+        if mask is not None and conf >= 0.01:
+            plate = cropping_plate(im_in, mask, con)
 
-    
     st.image(resized_im, caption=f"The image_{i}", use_container_width=True)
-    st.image(plate, caption=f"The plate_{i}", use_container_width=True)
-    
-    img_for_pil = Image.fromarray(plate)
-    buf = BytesIO()
-    img_for_pil.save(buf, format="PNG")
-    result_in_byte = buf.getvalue()
 
-    st.download_button(
-        label="Download Plate",
-        data=result_in_byte,
-        file_name=f"plate{i}.png",
-        mime="image/png",
-        key=f"download_plate_{i}"
-    )
+    if plate:
+        st.image(plate, caption=f"The plate_{i}", use_container_width=True)
+        
+        img_for_pil = Image.fromarray(plate)
+        buf = BytesIO()
+        img_for_pil.save(buf, format="PNG")
+        result_in_byte = buf.getvalue()
+    
+        st.download_button(
+            label="Download Plate",
+            data=result_in_byte,
+            file_name=f"plate{i}.png",
+            mime="image/png",
+            key=f"download_plate_{i}"
+        )
+    else:
+        st.write(f"Can not detect any plates in image_{i}")
 
 
 
