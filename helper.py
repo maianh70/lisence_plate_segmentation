@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 def mask_extracting(img, model):
-  test = model.predict(source=img, save=True, imgsz=640)
+  test = model.predict(source=img, imgsz=640, conf=0.0, iou=0.1, max_det=1)
   read_im = img.copy()
   try:
     if len(test[0].boxes.data) == 0:
@@ -25,9 +25,8 @@ def mask_extracting(img, model):
     for cnt in contours:
         cv2.drawContours(blank_mask, [cnt], -1, color=1, thickness=-1)
   
-    return blank_mask * 255, read_im_resized, contours
-  except Exception as e:
-    print(e)
+    return blank_mask * 255, read_im_resized, contours, conf
+  except Exception:
     return None, read_im, None, None
 
 
