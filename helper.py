@@ -4,21 +4,31 @@ import numpy as np
 def mask_extracting(img, model):
   test = model.predict(source=img, save=True, imgsz=640)
   read_im = img.copy()
-  mask = test[0].masks.data[0].cpu().numpy()
-  mask = (mask >= 0.3).astype(np.uint8)
+  try:
+    if len(test[0].boxes.data) == 0:
+      return None, read_im, None, None
 
-  kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
-  mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
-  mask = cv2.dilate(mask, kernel, iterations=1)
+    box = test[0].boxes
+    conf = box.conf.data[0]
 
-  read_im_resized = cv2.resize(read_im, (mask.shape[1], mask.shape[0]))
-  contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-  blank_mask = np.zeros_like(mask, dtype=np.uint8)
+    mask = test[0].masks.data[0].cpu().numpy()
+    mask = (mask >= 0.3).astype(np.uint8)
 
-  for cnt in contours:
-      cv2.drawContours(blank_mask, [cnt], -1, color=1, thickness=-1)
-
-  return blank_mask * 255, read_im_resized, contours
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3,3))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel, iterations=2)
+    mask = cv2.dilate(mask, kernel, iterations=1)
+  
+    read_im_resized = cv2.resize(read_im, (mask.shape[1], mask.shape[0]))
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    blank_mask = np.zeros_like(mask, dtype=np.uint8)
+  
+    for cnt in contours:
+        cv2.drawContours(blank_mask, [cnt], -1, color=1, thickness=-1)
+  
+    return blank_mask * 255, read_im_resized, contours
+  except Exception as e:
+    print(e)
+    return None, read_im, None, None
 
 
 def cropping_plate(img, mask, cont):
