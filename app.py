@@ -43,7 +43,7 @@ for i, file in enumerate(up_loaded_files):
         if mask is not None and conf >= 0.01:
             plate = cropping_plate(resized_im, mask, cont)
 
-        st.image(resized_im, caption=f"The image_{i}", use_container_width=True)
+        st.image(resized_im, caption=f"The image_{i} has a plate with {round(conf, 2) certainty.}", use_container_width=True)
     
         if plate is not None:
             st.image(plate, caption=f"The plate_{i}", use_container_width=True)
