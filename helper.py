@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 def mask_extracting(img, model):
-  test = model.predict(source=img, imgsz=640, conf=0.0, iou=0.1, max_det=1)
+  test = model.predict(source=img, imgsz=640, conf=0.0, iou=0.75, max_det=1)
   read_im = img.copy()
   try:
     if len(test[0].boxes.data) == 0:
